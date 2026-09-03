@@ -143,9 +143,9 @@
                 if (selectedExpRange) {
                     const expNum = parseInt(row.experience, 10);
                     if (!isNaN(expNum)) {
-                        if (selectedExpRange === "0-2") matchesExp = (expNum >= 0 && expNum <= 2);
+                        if (selectedExpRange === "0-3") matchesExp = (expNum >= 0 && expNum <= 3);
                         else if (selectedExpRange === "3-5") matchesExp = (expNum >= 3 && expNum <= 5);
-                        else if (selectedExpRange === "6-10") matchesExp = (expNum >= 6 && expNum <= 10);
+                        else if (selectedExpRange === "5-10") matchesExp = (expNum >= 5 && expNum <= 10);
                         else if (selectedExpRange === "11+") matchesExp = (expNum >= 11);
                     } else {
                         matchesExp = false;
