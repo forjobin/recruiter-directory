@@ -8,8 +8,33 @@
 </head>
 <body class="bg-slate-50 text-slate-800 p-6">
     <div class="max-w-5xl mx-auto">
-        <h1 class="text-2xl font-bold mb-2">Recruiter Hotlist</h1>
-        <p class="text-sm text-slate-500 mb-6">Search and filter active recruiters instantly.</p>
+        
+        <!-- HEADER SECTION WITH LOGO, PITCH & TALLY LINK -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            
+            <!-- Logo & Title Area -->
+            <div class="flex items-center gap-4">
+                <!-- Replace the src URL below with your actual logo image link -->
+                <img src="https://via.placeholder.com/60" alt="Logo" class="w-14 h-14 rounded-lg object-contain border border-slate-100">
+                <div>
+                    <h1 class="text-2xl font-bold text-slate-900">Recruiter Hotlist</h1>
+                    <p class="text-sm text-slate-500 mt-0.5">Connect with active recruitment professionals instantly.</p>
+                </div>
+            </div>
+
+            <!-- Value Proposition & Tally Signup Button -->
+            <div class="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-right">
+                <p class="text-xs sm:text-sm text-slate-600 max-w-xs">
+                    Are you a recruiter? Get listed to expand your network and close positions faster.
+                </p>
+                <!-- PASTE YOUR TALLY LINK BELOW -->
+                <a href="https://tally.so/r/YOUR-TALLY-FORM-LINK" target="_blank" 
+                   class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded-lg shadow-sm text-sm transition-colors whitespace-nowrap">
+                    Sign Up Now &rarr;
+                </a>
+            </div>
+
+        </div>
         
         <!-- Search Bar -->
         <input type="text" id="searchInput" placeholder="Filter by name, experience, town, or city (e.g., Hinjewadi)..." 
