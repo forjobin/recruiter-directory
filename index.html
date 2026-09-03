@@ -7,12 +7,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-50 text-slate-800 p-6">
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-5xl mx-auto">
         <h1 class="text-2xl font-bold mb-2">Recruiter Hotlist</h1>
         <p class="text-sm text-slate-500 mb-6">Search and filter active recruiters instantly.</p>
         
         <!-- Search Bar -->
-        <input type="text" id="searchInput" placeholder="Filter by name, experience, or location (e.g., Hinjewadi)..." 
+        <input type="text" id="searchInput" placeholder="Filter by name, experience, town, or city (e.g., Hinjewadi)..." 
             class="w-full p-3 border border-slate-300 rounded-lg shadow-sm mb-6 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
 
         <!-- Table -->
@@ -29,7 +29,7 @@
                 </thead>
                 <tbody class="divide-y divide-slate-200" id="tableBody">
                     <tr>
-                        <td colspan="4" class="px-6 py-8 text-center text-slate-400">Loading directory...</td>
+                        <td colspan="5" class="px-6 py-8 text-center text-slate-400">Loading directory...</td>
                     </tr>
                 </tbody>
             </table>
@@ -41,7 +41,6 @@
 
         async function loadDirectory() {
             try {
-                // Automatically loads data.json from the same repository
                 const response = await fetch('data.json');
                 allData = await response.json();
                 renderTable(allData);
@@ -66,7 +65,8 @@
                 tr.innerHTML = `
                     <td class="px-6 py-4 font-medium text-slate-900">${escapeHtml(row.name || '')}</td>
                     <td class="px-6 py-4 text-slate-600">${escapeHtml(String(row.experience || ''))} yrs</td>
-                    <td class="px-6 py-4 text-slate-600"><span class="bg-blue-50 text-blue-700 px-2.5 py-1 rounded text-xs font-medium">${escapeHtml(row.location || '')}</span></td>
+                    <td class="px-6 py-4 text-slate-600"><span class="bg-blue-50 text-blue-700 px-2.5 py-1 rounded text-xs font-medium">${escapeHtml(row.Town || '')}</span></td>
+                    <td class="px-6 py-4 text-slate-600">${escapeHtml(row.City || '')}</td>
                     <td class="px-6 py-4"><a href="${escapeHtml(row.linkedin || '#')}" target="_blank" class="text-blue-600 hover:text-blue-800 font-medium text-sm inline-flex items-center gap-1">LinkedIn &rarr;</a></td>
                 `;
                 tableBody.appendChild(tr);
