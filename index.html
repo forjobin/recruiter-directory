@@ -99,15 +99,25 @@
         }
 
         document.getElementById('searchInput').addEventListener('input', function(e) {
-            const query = e.target.value.toLowerCase();
+            const query = e.target.value.toLowerCase().trim();
+            
             const filtered = allData.filter(row => {
-                return Object.values(row).some(val => 
-                    String(val).toLowerCase().includes(query)
-                );
+                if (!query) return true;
+
+                // Check text fields normally (Name, Town, City match partially)
+                const nameMatch = String(row.name || '').toLowerCase().includes(query);
+                const townMatch = String(row.Town || '').toLowerCase().includes(query);
+                const cityMatch = String(row.City || '').toLowerCase().includes(query);
+                
+                // Check experience strictly (so typing '1' doesn't pull up '12')
+                const expStr = String(row.experience || '').toLowerCase().trim();
+                const expMatch = expStr === query || expStr.startsWith(query + ' ') || expStr.startsWith(query + 'yrs');
+
+                return nameMatch || townMatch || cityMatch || expMatch;
             });
+            
             renderTable(filtered);
         });
-
         function escapeHtml(str) {
             return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
