@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recruiter Directory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 p-6">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-2xl font-bold mb-2">Recruiter Hotlist</h1>
+        <p class="text-sm text-slate-500 mb-6">Search and filter active recruiters instantly.</p>
+        
+        <!-- Search Bar -->
+        <input type="text" id="searchInput" placeholder="Filter by name, experience, or location (e.g., Hinjewadi)..." 
+            class="w-full p-3 border border-slate-300 rounded-lg shadow-sm mb-6 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+        <!-- Table -->
+        <div class="bg-white rounded-lg shadow overflow-hidden border border-slate-200">
+            <table class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-100">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Experience</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Town</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">City</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Profile</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200" id="tableBody">
+                    <tr>
+                        <td colspan="4" class="px-6 py-8 text-center text-slate-400">Loading directory...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let allData = [];
+
+        async function loadDirectory() {
+            try {
+                // Automatically loads data.json from the same repository
+                const response = await fetch('data.json');
+                allData = await response.json();
+                renderTable(allData);
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('tableBody').innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-rose-500">Error loading data.json file.</td></tr>`;
+            }
+        }
+
+        function renderTable(data) {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+
+            if (data.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400">No entries found.</td></tr>`;
+                return;
+            }
+
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition-colors';
+                tr.innerHTML = `
+                    <td class="px-6 py-4 font-medium text-slate-900">${escapeHtml(row.name || '')}</td>
+                    <td class="px-6 py-4 text-slate-600">${escapeHtml(String(row.experience || ''))} yrs</td>
+                    <td class="px-6 py-4 text-slate-600"><span class="bg-blue-50 text-blue-700 px-2.5 py-1 rounded text-xs font-medium">${escapeHtml(row.location || '')}</span></td>
+                    <td class="px-6 py-4"><a href="${escapeHtml(row.linkedin || '#')}" target="_blank" class="text-blue-600 hover:text-blue-800 font-medium text-sm inline-flex items-center gap-1">LinkedIn &rarr;</a></td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase();
+            const filtered = allData.filter(row => {
+                return Object.values(row).some(val => 
+                    String(val).toLowerCase().includes(query)
+                );
+            });
+            renderTable(filtered);
+        });
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        loadDirectory();
+    </script>
+</body>
+</html>
