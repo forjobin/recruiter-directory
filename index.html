@@ -9,36 +9,56 @@
 <body class="bg-slate-50 text-slate-800 p-6">
     <div class="max-w-5xl mx-auto">
         
-        <!-- HEADER SECTION WITH LOGO, PITCH & TALLY LINK -->
+        <!-- HEADER SECTION -->
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6 flex flex-col md:flex-row justify-between items-center gap-6">
-            
-            <!-- Logo & Title Area -->
             <div class="flex items-center gap-4">
-                <!-- Replace the src URL below with your actual logo image link -->
-                <img src="favicon.png" alt="Logo" class="w-14 h-14 rounded-lg object-contain border border-slate-100">
+                <img src="https://via.placeholder.com/60" alt="Logo" class="w-14 h-14 rounded-lg object-contain border border-slate-100">
                 <div>
                     <h1 class="text-2xl font-bold text-slate-900">Recruiter Hotlist</h1>
-                    <p class="text-sm text-slate-500 mt-0.5">Connect with active recruitment professionals instantly.</p>
+                    <p class="text-sm text-slate-500 mt-0.5">Filter active recruitment professionals by location and experience.</p>
                 </div>
             </div>
-
-            <!-- Value Proposition & Tally Signup Button -->
             <div class="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-right">
                 <p class="text-xs sm:text-sm text-slate-600 max-w-xs">
                     Are you a recruiter? Get listed to expand your network and close positions faster.
                 </p>
-                <!-- PASTE YOUR TALLY LINK BELOW -->
                 <a href="https://tally.so/r/YOUR-TALLY-FORM-LINK" target="_blank" 
                    class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded-lg shadow-sm text-sm transition-colors whitespace-nowrap">
                     Sign Up Now &rarr;
                 </a>
             </div>
-
         </div>
         
-        <!-- Search Bar -->
-        <input type="text" id="searchInput" placeholder="Filter by name, experience, town, or city (e.g., Hinjewadi)..." 
-            class="w-full p-3 border border-slate-300 rounded-lg shadow-sm mb-6 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <!-- FILTER CONTROLS BAR -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- General Keyword Search -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Search Keyword</label>
+                <input type="text" id="searchInput" placeholder="Search name or keywords..." 
+                    class="w-full p-2.5 border border-slate-300 rounded-lg text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <!-- Town / Location Filter Dropdown -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Filter by Town</label>
+                <select id="townFilter" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Towns (Hinjewadi, Kharadi...)</option>
+                    <!-- Options populated automatically by script -->
+                </select>
+            </div>
+
+            <!-- Experience Range Filter Dropdown -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Filter by Experience</label>
+                <select id="expFilter" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Experience Levels</option>
+                    <option value="0-2">0 - 2 Years</option>
+                    <option value="3-5">3 - 5 Years</option>
+                    <option value="6-10">6 - 10 Years</option>
+                    <option value="11+">11+ Years</option>
+                </select>
+            </div>
+        </div>
 
         <!-- Table -->
         <div class="bg-white rounded-lg shadow overflow-hidden border border-slate-200">
@@ -68,6 +88,7 @@
             try {
                 const response = await fetch('data.json');
                 allData = await response.json();
+                populateTownDropdown(allData);
                 renderTable(allData);
             } catch (error) {
                 console.error('Error loading data:', error);
@@ -75,12 +96,25 @@
             }
         }
 
+        function populateTownDropdown(data) {
+            const townSelect = document.getElementById('townFilter');
+            // Extract unique towns
+            const towns = [...new Set(data.map(row => row.Town).filter(Boolean))];
+            
+            towns.forEach(town => {
+                const option = document.createElement('option');
+                option.value = town;
+                option.textContent = town;
+                townSelect.appendChild(option);
+            });
+        }
+
         function renderTable(data) {
             const tableBody = document.getElementById('tableBody');
             tableBody.innerHTML = '';
 
             if (data.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400">No entries found.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400">No matching entries found.</td></tr>`;
                 return;
             }
 
@@ -98,29 +132,44 @@
             });
         }
 
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const query = e.target.value.toLowerCase().trim();
-            
+        function filterData() {
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase().trim();
+            const selectedTown = document.getElementById('townFilter').value;
+            const selectedExpRange = document.getElementById('expFilter').value;
+
             const filtered = allData.filter(row => {
-                if (!query) return true;
+                // 1. Keyword search match
+                const matchesSearch = !searchQuery || Object.values(row).some(val => 
+                    String(val).toLowerCase().includes(searchQuery)
+                );
 
-                // Check text fields normally (Name, Town, City match partially)
-                const nameMatch = String(row.name || '').toLowerCase().includes(query);
-                const townMatch = String(row.Town || '').toLowerCase().includes(query);
-                const cityMatch = String(row.City || '').toLowerCase().includes(query);
-                
-                // Check experience strictly (so typing '1' doesn't pull up '12')
-                const expStr = String(row.experience || '').toLowerCase().trim();
-                const expMatch = expStr === query || expStr.startsWith(query + ' ') || expStr.startsWith(query + 'yrs');
+                // 2. Town dropdown match
+                const matchesTown = !selectedTown || row.Town === selectedTown;
 
-                return nameMatch || townMatch || cityMatch || expMatch;
+                // 3. Experience range match
+                let matchesExp = true;
+                if (selectedExpRange) {
+                    const expNum = parseInt(row.experience, 10);
+                    if (!isNaN(expNum)) {
+                        if (selectedExpRange === "0-2") matchesExp = (expNum >= 0 && expNum <= 2);
+                        else if (selectedExpRange === "3-5") matchesExp = (expNum >= 3 && expNum <= 5);
+                        else if (selectedExpRange === "6-10") matchesExp = (expNum >= 6 && expNum <= 10);
+                        else if (selectedExpRange === "11+") matchesExp = (expNum >= 11);
+                    } else {
+                        matchesExp = false;
+                    }
+                }
+
+                return matchesSearch && matchesTown && matchesExp;
             });
-            
+
             renderTable(filtered);
-        });
-        function escapeHtml(str) {
-            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
+
+        // Attach event listeners to all filters
+        document.getElementById('searchInput').addEventListener('input', filterData);
+        document.getElementById('townFilter').addEventListener('change', filterData);
+        document.getElementById('expFilter').addEventListener('change', filterData);
 
         loadDirectory();
     </script>
